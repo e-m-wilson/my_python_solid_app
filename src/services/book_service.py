@@ -1,5 +1,5 @@
-from repositories.book_repository_protocol import BookRepositoryProtocol
-from domain.book import Book
+from src.repositories.book_repository_protocol import BookRepositoryProtocol
+from src.domain.book import Book
 
 class BookService:
     def __init__(self, repo: BookRepositoryProtocol):

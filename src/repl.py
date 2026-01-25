@@ -1,7 +1,7 @@
-from services.book_generator_service import generate_books_json
-from domain.book import Book
-from services.book_service import BookService
-from repositories.book_repository import BookRepository
+from src.services import generate_books
+from src.domain.book import Book
+from src.services.book_service import BookService
+from src.repositories.book_repository import BookRepository
 
 class BookREPL:
     def __init__(self, book_svc):
@@ -52,7 +52,7 @@ class BookREPL:
 
 
 if __name__ == '__main__':
-    generate_books_json()
+    generate_books()
     repo = BookRepository('books.json')
     book_service = BookService(repo)
     repl = BookREPL(book_service)

@@ -1,5 +1,5 @@
 from typing import Protocol
-from domain.book import Book
+from src.domain.book import Book
 
 class BookRepositoryProtocol(Protocol):
     def get_all_books(self) -> list[Book]:
