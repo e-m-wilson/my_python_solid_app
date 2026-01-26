@@ -12,4 +12,6 @@ class BookService:
         return self.repo.add_book(book)
 
     def find_book_by_name(self, query:str) -> list[Book]:
+        if not isinstance(query, str):
+            raise TypeError('Expected str, got something else.')
         return self.repo.find_book_by_name(query)

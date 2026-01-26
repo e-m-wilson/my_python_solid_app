@@ -1,8 +1,10 @@
 import requests
-from src.services import generate_books
+
 from src.domain.book import Book
-from src.services.book_service import BookService
 from src.repositories.book_repository import BookRepository
+from src.services import generate_books
+from src.services.book_service import BookService
+
 
 class BookREPL:
     def __init__(self, book_svc):
@@ -14,7 +16,7 @@ class BookREPL:
         while self.running:
             cmd = input('>>>').strip()
             self.handle_command(cmd)
-    
+
     def handle_command(self, cmd):
         if cmd == 'exit':
             self.running = False
@@ -31,7 +33,7 @@ class BookREPL:
             print('Available commands: addBook, getAllRecords, findByName, getJoke, help, exit')
         else:
             print('Please use a valid command!')
-    
+
     def find_book_by_name(self):
         query = input('Please enter book name: ')
         books = self.book_svc.find_book_by_name(query)
