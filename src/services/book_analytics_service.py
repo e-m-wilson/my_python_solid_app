@@ -12,11 +12,12 @@ class BookAnalyticsService:
         prices = np.array([b.price_usd for b in books], dtype=float)
         return float(prices.mean())
 
-    def top_rated(self, books: list[Book], min_ratings: int = 1000) -> list[Book]:
+    def top_rated(self, books: list[Book], min_ratings: int = 1000, limit: int = 10) -> list[Book]:
         ratings = np.array([b.average_rating for b in books])
         counts = np.array([b.ratings_count for b in books])
 
         # this says: "get me all books that have a minimum of 1000 ratings"
+        # this is a vectorized comparison
         mask = counts >= min_ratings
         filtered = np.array(books)[mask]
 
@@ -34,7 +35,7 @@ class BookAnalyticsService:
         # '[::-1]' <- sort in descending order
         sorted_idx = np.argsort(scores)[::-1]
         # return our filtered records that are sorted, converted to List[Book]
-        return filtered[sorted_idx].tolist()
+        return filtered[sorted_idx].tolist()[:limit]
 
     # Value Score = rating × log(ratings_count) ÷ price
     def value_scores(self, books: list[Book]) -> dict[str, float]:
