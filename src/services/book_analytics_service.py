@@ -2,7 +2,7 @@ import numpy as np
 from src.domain.book import Book
 
 # Rules:
-# keep numpy in service layer. it should NOT enter domain EVER
+# keep numpy in service layer. it should NOT enter other layers EVER
 # if any numpy imports are in domain or repo layers - this is a design smell
 # notice how each method takes in List[Book] and returns normal datatypes NOT ndarrays!
 # -- this keeps our tests CLEAN and our functions PURE
