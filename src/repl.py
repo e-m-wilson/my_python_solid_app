@@ -1,4 +1,3 @@
-from src.services import generate_books
 from src.services.book_generator_service_V2 import generate_books_json
 from src.services.book_generator_bad_data_service import generate_books as get_bad_books
 from src.domain.book import Book

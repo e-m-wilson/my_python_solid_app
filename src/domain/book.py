@@ -6,7 +6,7 @@ import uuid
 class Book:
     title: str
     author: str
-    genre: Optional[int] = None
+    genre: Optional[str] = None
     publication_year: Optional[int] = None
     page_count: Optional[int] = None
     average_rating: Optional[float] = None
