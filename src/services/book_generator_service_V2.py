@@ -3,9 +3,10 @@ import random
 import uuid
 from datetime import datetime, timedelta
 import numpy as np
+from src.domain.book import Book
 
 
-def generate_books_json(filename="books.json", count=500, seed=None):
+def generate_books(filename="books.json", count=500, seed=None) -> list[Book]:
     rng = np.random.default_rng(seed)
     random.seed(seed)
 
@@ -117,25 +118,27 @@ def generate_books_json(filename="books.json", count=500, seed=None):
         # apply a small genre-specific bias to average_rating so popularity shows in Bayesian avg
         # rating_adj already computed above for sales calculation
         books.append(
-            {
-                "book_id": str(uuid.uuid4()),
-                "title": f"Book Title {i}",
-                "author": f"Author {rng.integers(1, 80)}",
-                "genre": genre_choice,
-                "publication_year": pub_year,
-                "page_count": int(rng.integers(80, 1200)),
-                "average_rating": rating_adj,
-                "ratings_count": int(adj_ratings_count),
-                "price_usd": float(price_usd[idx]),
-                "publisher": random.choice(publishers),
-                "language": "English",
-                "format": random.choice(formats),
-                "in_print": bool(rng.choice([True, True, True, True, False])),
-                "sales_millions": float(adj_sales_millions),
-                "last_checkout": last_checkout.isoformat(),
-                "available": bool(rng.choice([True, False])),
-            }
+        Book(
+                book_id = str(uuid.uuid4()),
+                title = f"Book Title {i}",
+                author = f"Author {rng.integers(1, 80)}",
+                genre = genre_choice,
+                publication_year = pub_year,
+                page_count = int(rng.integers(80, 1200)),
+                average_rating = rating_adj,
+                ratings_count = int(adj_ratings_count),
+                price_usd = float(price_usd[idx]),
+                publisher = random.choice(publishers),
+                language = "English",
+                format = random.choice(formats),
+                in_print = bool(rng.choice([True, True, True, True, False])),
+                sales_millions = float(adj_sales_millions),
+                last_checkout = last_checkout.isoformat(),
+                available = bool(rng.choice([True, False])),
+            )
         )
 
-    with open(filename, "w", encoding="utf-8") as f:
-        json.dump(books, f, indent=2)
+    # we are returning list[Book] now so we can populate the database so commenting this out
+    #with open(filename, "w", encoding="utf-8") as f:
+    #   json.dump(books, f, indent=2)
+    return books

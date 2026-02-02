@@ -1,16 +1,19 @@
-from fastapi import FastAPI, Depends, HTTPException, Query
-from pydantic import BaseModel
+import os
 from typing import List, Optional
 from uuid import UUID
-import os
-from dotenv import load_dotenv
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, Session
 
-from src.repositories.book_repository_sql import SQLBookRepository
-from src.services.book_service import BookService
-from src.services.book_analytics_service import BookAnalyticsService
+import uvicorn
+from dotenv import load_dotenv
+from fastapi import Depends, FastAPI, HTTPException, Query
+from pydantic import BaseModel
+from sqlalchemy import create_engine
+from sqlalchemy.orm import Session, sessionmaker
+
 from src.domain.book import Book as BookModel
+from src.repositories.book_repository_sql import SQLBookRepository
+from src.services.book_analytics_service import BookAnalyticsService
+from src.services.book_generator_service_V2 import generate_books
+from src.services.book_service import BookService
 
 load_dotenv()
 DATABASE_URL = os.getenv("DATABASE_URL")
@@ -72,6 +75,15 @@ def create_book(payload: BookCreate, db: Session = Depends(get_db)):
     new_id = svc.add_book(book)
     return new_id
 
+@app.post("/books/generate")
+def generate_seed_books(db: Session = Depends(get_db)):
+    repo = SQLBookRepository(db)
+    svc = BookService(repo)
+    books = generate_books()
+    for b in books:
+        svc.add_book(b)
+
+    return "Books added to DB..."
 
 @app.get("/books/search", response_model=List[BookRead])
 def search_books(title: str = Query(..., min_length=1), db: Session = Depends(get_db)):
@@ -121,5 +133,4 @@ def get_joke():
 
 
 if __name__ == "__main__":
-    import uvicorn
     uvicorn.run("src.main:app", host="0.0.0.0", port=8000, reload=False)

@@ -4,13 +4,7 @@ from src.domain.book import Book
 from src.services.book_service import BookService
 from src.services.book_analytics_service import BookAnalyticsService
 from src.repositories.book_repository import BookRepository
-from src.repositories.book_repository_sql import SQLBookRepository
 import requests
-from dotenv import load_dotenv
-import os
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-from src.base import Base
 
 class BookREPL:
     def __init__(self, book_svc, book_analytics_svc):
@@ -96,22 +90,10 @@ class BookREPL:
             print(f'An unexpected error has occurred: {e}')
 
 if __name__ == '__main__':
-    load_dotenv()
     generate_books_json()
     get_bad_books()
-
-    database_url = os.getenv("DATABASE_URL")
-    engine = create_engine(database_url, echo=False)
-    SessionLocal = sessionmaker(bind=engine)
-
-    # Optional: create tables when not relying on Alembic migrations
-    # Base.metadata.create_all(bind=engine)
-
-    session = SessionLocal()
-
     repo = BookRepository('books.json')
-    sqlRepo = SQLBookRepository(session)
-    book_service = BookService(sqlRepo)
+    book_service = BookService(repo)
     book_analytics_service = BookAnalyticsService()
     repl = BookREPL(book_service, book_analytics_service)
     repl.start()
