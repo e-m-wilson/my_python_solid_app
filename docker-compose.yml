@@ -4,8 +4,8 @@ services:
     container_name: myapp
     env_file:
       - .env
-    #volumes:  # Makes it so you don't have to rebuild the container if you update python code
-    # - .:/app # useful for development, remove in prod, or during migrations
+    volumes:  # Makes it so you don't have to rebuild the container if you update python code
+     - .:/app # useful for development, remove in prod, or during migrations
     depends_on:
       db:
         condition: service_healthy
@@ -31,15 +31,6 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
-  
-  migrate:
-    build: .
-    env_file: [.env]
-    depends_on:
-      db:
-        condition: service_healthy
-    command: ["alembic", "upgrade", "head"]
-    restart: "no"
 
 volumes:
   postgres_data:

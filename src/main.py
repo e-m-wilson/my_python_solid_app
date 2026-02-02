@@ -81,7 +81,7 @@ def check_out_book(payload: CheckoutHistoryCreate, db: Session = Depends(get_db)
 
     return {"status": "checked out"}
 
-@app.get("/checkouthistory")
+@app.get("/checkouthistory", response_model=list[CheckoutHistoryRead])
 def checkout_history(payload: CheckoutHistoryCreate, db: Session = Depends(get_db)):
     book_repo = SQLBookRepository(db)
     check_book_repo = SQLCheckHistoryRepository(db)

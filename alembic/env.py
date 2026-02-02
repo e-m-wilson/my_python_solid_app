@@ -4,8 +4,10 @@ from dotenv import load_dotenv
 load_dotenv()
 
 import os
-# import all our domains so alembic picks it up, I think this is needed?
-import src.domain.book
+# import all our domains so alembic picks it up
+# this is 100% needed, even if not referenced directly
+# __init__.py in domain is wrapping them all up for us
+import src.domain
 from src.base import Base
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
