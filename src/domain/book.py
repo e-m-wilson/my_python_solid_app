@@ -25,7 +25,6 @@ class Book(Base):
     format = Column(String, nullable=True)
     in_print = Column(Boolean, nullable=True)
     sales_millions = Column(Float, nullable=True)
-    last_checkout = Column(String, nullable=True)
     available = Column(Boolean, default=True)
     publisher_email = Column(String, nullable=True)
 

@@ -1,19 +1,21 @@
 import os
-from typing import List, Optional
-from uuid import UUID
 
 import uvicorn
 from dotenv import load_dotenv
 from fastapi import Depends, FastAPI, HTTPException, Query
-from pydantic import BaseModel
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
 
-from src.domain.book import Book as BookModel
+from src.domain.book import Book
+from src.domain.checkout_history import CheckoutHistory
+from src.schemas.book import BookCreate, BookRead
+from src.schemas.checkout_history import CheckoutHistoryCreate, CheckoutHistoryRead
 from src.repositories.book_repository_sql import SQLBookRepository
+from src.repositories.checkout_history_repo import SQLCheckHistoryRepository
 from src.services.book_analytics_service import BookAnalyticsService
 from src.services.book_generator_service_V2 import generate_books
 from src.services.book_service import BookService
+from src.services.check_book_service import CheckService
 
 load_dotenv()
 DATABASE_URL = os.getenv("DATABASE_URL")
@@ -34,33 +36,7 @@ def get_db():
         db.close()
 
 
-class BookCreate(BaseModel):
-    title: str
-    author: str
-    genre: Optional[str] = None
-    publication_year: Optional[int] = None
-    page_count: Optional[int] = None
-    average_rating: Optional[float] = None
-    ratings_count: Optional[int] = None
-    price_usd: Optional[float] = None
-    publisher: Optional[str] = None
-    language: Optional[str] = None
-    format: Optional[str] = None
-    in_print: Optional[bool] = True
-    sales_millions: Optional[float] = None
-    last_checkout: Optional[str] = None
-    publisher_email: Optional[str] = None
-
-
-class BookRead(BookCreate):
-    book_id: UUID
-    available: Optional[bool] = True
-
-    class Config:
-        orm_mode = True
-
-
-@app.get("/books", response_model=List[BookRead])
+@app.get("/books", response_model=list[BookRead])
 def list_books(db: Session = Depends(get_db)):
     repo = SQLBookRepository(db)
     svc = BookService(repo)
@@ -71,7 +47,7 @@ def list_books(db: Session = Depends(get_db)):
 def create_book(payload: BookCreate, db: Session = Depends(get_db)):
     repo = SQLBookRepository(db)
     svc = BookService(repo)
-    book = BookModel(**payload.dict())
+    book = Book(**payload.model_dump())
     new_id = svc.add_book(book)
     return new_id
 
@@ -85,7 +61,37 @@ def generate_seed_books(db: Session = Depends(get_db)):
 
     return "Books added to DB..."
 
-@app.get("/books/search", response_model=List[BookRead])
+@app.post("/checkinbook")
+def check_in_book(payload: CheckoutHistoryCreate, db: Session = Depends(get_db)):
+    book_repo = SQLBookRepository(db)
+    check_book_repo = SQLCheckHistoryRepository(db)
+
+    svc = CheckService(db, book_repo, check_book_repo)
+    svc.check_in_book(payload.book_id)
+
+    return {"status": "checked in"}
+
+@app.post("/checkoutbook")
+def check_out_book(payload: CheckoutHistoryCreate, db: Session = Depends(get_db)):
+    book_repo = SQLBookRepository(db)
+    check_book_repo = SQLCheckHistoryRepository(db)
+
+    svc = CheckService(db, book_repo, check_book_repo)
+    svc.check_out_book(payload.book_id)
+
+    return {"status": "checked out"}
+
+@app.get("/checkouthistory")
+def checkout_history(payload: CheckoutHistoryCreate, db: Session = Depends(get_db)):
+    book_repo = SQLBookRepository(db)
+    check_book_repo = SQLCheckHistoryRepository(db)
+
+    svc = CheckService(db, book_repo, check_book_repo)
+    history = svc.get_checkout_history(payload.book_id)
+
+    return history
+
+@app.get("/books/search", response_model=list[BookRead])
 def search_books(title: str = Query(..., min_length=1), db: Session = Depends(get_db)):
     repo = SQLBookRepository(db)
     svc = BookService(repo)
@@ -103,7 +109,7 @@ def average_price(db: Session = Depends(get_db)):
     return {"average_price": analytics.average_price(books)}
 
 
-@app.get("/analytics/top_books", response_model=List[BookRead])
+@app.get("/analytics/top_books", response_model=list[BookRead])
 def top_books(min_ratings: int = 1000, limit: int = 10, db: Session = Depends(get_db)):
     repo = SQLBookRepository(db)
     svc = BookService(repo)

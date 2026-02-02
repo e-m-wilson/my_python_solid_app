@@ -4,14 +4,14 @@ services:
     container_name: myapp
     env_file:
       - .env
-    #volumes:
+    #volumes:  # Makes it so you don't have to rebuild the container if you update python code
     # - .:/app # useful for development, remove in prod, or during migrations
     depends_on:
       db:
         condition: service_healthy
     ports:
       - "8000:8000"
-    command: ["sh", "-c", "poetry run uvicorn src.main:app --host 0.0.0.0 --port 8000"]
+    command: ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8000"]
 
   db:
     image: postgres:15
@@ -35,12 +35,10 @@ services:
   migrate:
     build: .
     env_file: [.env]
-    volumes:
-      - .:/app
     depends_on:
       db:
         condition: service_healthy
-    command: ["sh", "-c", "poetry run alembic upgrade head"]
+    command: ["alembic", "upgrade", "head"]
     restart: "no"
 
 volumes:

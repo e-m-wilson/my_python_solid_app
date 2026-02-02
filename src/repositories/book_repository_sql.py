@@ -17,3 +17,21 @@ class SQLBookRepository(BookRepositoryProtocol):
 
     def find_book_by_name(self, query: str) -> List[Book]:
         return self.session.query(Book).filter(Book.title == query).all()
+
+    def check_out_book(self, book_id: str) -> Book:
+        book = self.session.get(Book, book_id)
+        if not book:
+            raise Exception("Book not found.")
+        book.check_out()
+        self.session.commit()
+        self.session.refresh(book)
+        return book
+
+    def check_in_book(self, book_id: str) -> Book:
+        book = self.session.get(Book, book_id)
+        if not book:
+            raise Exception("Book not found.")
+        book.check_in()
+        self.session.commit()
+        self.session.refresh(book)
+        return book

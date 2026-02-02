@@ -22,9 +22,6 @@ RUN poetry config virtualenvs.create false
 # Install project dependencies without dev packages
 RUN poetry install --without dev --no-interaction --no-ansi
 
-# Ensure Poetry bin dir is on PATH
-ENV PATH="/usr/local/bin:/root/.local/bin:$PATH"
-
 # Copy the rest of the source code / alembic
 COPY src /app/src
 COPY src/repl.py /app/repl.py
@@ -38,13 +35,13 @@ WORKDIR /app
 
 # Copy installed packages from builder
 COPY --from=builder /usr/local/lib/python3.12 /usr/local/lib/python3.12
-COPY --from=builder /app /app
 COPY --from=builder /usr/local/bin /usr/local/bin
-COPY --from=builder /root/.local /root/.local
+COPY --from=builder /app /app
 
 # Set environment variables
-ENV PATH="/usr/local/bin:/root/.local/bin:$PATH"
+# Python buffered is required for logs to work correctly/quickly with docker
+# PATH doesn't carry over from stage 1. we add /usr/local/bin because that's where alembic/uvicorn is
 ENV PYTHONUNBUFFERED=1
-
+ENV PATH="/usr/local/bin:/root/.local/bin:$PATH"
 # Command to run
-CMD ["sh", "-c", "poetry run uvicorn src.main:app --host 0.0.0.0 --port 8000"]
+CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8000"]

@@ -133,7 +133,6 @@ def generate_books(filename="books.json", count=500, seed=None) -> list[Book]:
                 format = random.choice(formats),
                 in_print = bool(rng.choice([True, True, True, True, False])),
                 sales_millions = float(adj_sales_millions),
-                last_checkout = last_checkout.isoformat(),
                 available = bool(rng.choice([True, False])),
             )
         )
