@@ -4,8 +4,10 @@ import uuid
 from datetime import datetime, timedelta
 import numpy as np
 from src.domain.book import Book
+from src.domain.checkout_history import CheckoutHistory
 
-def generate_books(filename="books.json", count=500, seed=None):
+
+def generate(filename="books.json", count=500, seed=None) -> tuple[list[Book], list[CheckoutHistory]]:
     rng = np.random.default_rng(seed)
     random.seed(seed)
 
@@ -77,18 +79,13 @@ def generate_books(filename="books.json", count=500, seed=None):
     )
 
     books = []
+    checkout_histories = []
     now = datetime.now()
     six_months_ago = now - timedelta(days=182)
 
     for i in range(1, count + 1):
         # publication year from weighted distribution
         pub_year = int(rng.choice(years, p=year_weights))
-
-        random_days = int(rng.integers(0, 183))
-        random_seconds = int(rng.integers(0, 80000))
-        last_checkout = six_months_ago + timedelta(
-            days=random_days, seconds=random_seconds
-        )
 
         idx = i - 1
 
@@ -116,9 +113,9 @@ def generate_books(filename="books.json", count=500, seed=None):
 
         # apply a small genre-specific bias to average_rating so popularity shows in Bayesian avg
         # rating_adj already computed above for sales calculation
-        books.append(
-            Book(
-                book_id = str(uuid.uuid4()),
+        book_id = str(uuid.uuid4())
+        book = Book(
+                book_id = book_id,
                 title = f"Book Title {i}",
                 author = f"Author {rng.integers(1, 80)}",
                 genre = genre_choice,
@@ -134,8 +131,30 @@ def generate_books(filename="books.json", count=500, seed=None):
                 sales_millions = float(adj_sales_millions),
                 available = bool(rng.choice([True, False])),
             )
-        )
+        books.append(book)
 
-    #with open(filename, "w", encoding="utf-8") as f:
-    #    json.dump(books, f, indent=2)
-    return books
+     # Generate checkout history for the book
+        num_checkouts = rng.integers(0, 50)  # Random number of checkouts per book
+        for _ in range(num_checkouts):
+            checkout_date = datetime.now() - timedelta(
+                days=int(rng.integers(0, 365)), seconds=int(rng.integers(0, 86400))
+            )
+            due_date = checkout_date + timedelta(days=14)
+            return_date = (
+                due_date + timedelta(days=int(rng.integers(0, 7)))
+                if rng.choice([True, False])
+                else None
+            )
+            returned = return_date is not None
+
+            checkout_history = CheckoutHistory(
+                checkout_id=uuid.uuid4(),
+                book_id=book_id,
+                checkout_date=checkout_date,
+                due_date=due_date,
+                return_date=return_date,
+                returned=returned,
+            )
+            checkout_histories.append(checkout_history)
+
+    return books, checkout_histories

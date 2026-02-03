@@ -20,10 +20,15 @@ class BookCreate(BaseModel):
     publisher_email: Optional[str] = None
 
 
-class BookRead(BookCreate):
+class BookRead(BaseModel):
     book_id: UUID
     title: str
     author: str
 
     class Config:
         from_attributes = True
+        fields = {
+            "book_id": ...,
+            "title": ...,
+            "author": ...,
+        }

@@ -9,6 +9,9 @@ from dotenv import load_dotenv
 load_dotenv()
 
 import os
+
+# THIS IS 100% REQUIRED IN ORDER FOR YOUR CONTEXT TO POPULATE WITH METADATA
+# YOUR CONTEXT WILL NOT GET YOUR BASE METADATA UNLESS YOU IMPORT ALL OF THE EFFECTED DOMAIN MODELS
 import src.domain
 from src.base import Base
 
