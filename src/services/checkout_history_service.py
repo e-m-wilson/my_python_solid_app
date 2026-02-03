@@ -3,16 +3,16 @@ from src.repositories.book_repository_protocol import BookRepositoryProtocol
 from src.domain.checkout_history import CheckoutHistory
 from datetime import datetime, timezone
 
-class CheckService:
+class CheckoutHistoryService:
     def __init__(self,
                  db,
                  book_repo: BookRepositoryProtocol,
-                 check_book_repo: CheckoutHistoryRepositoryProtocol
+                 checkout_history_repo: CheckoutHistoryRepositoryProtocol
         ):
         self.db = db
         self.book_repo = book_repo
-        self.check_book_repo = check_book_repo
-
+        self.checkout_history_repo = checkout_history_repo
+    # (no need to call commit, db.begin() + db.rollback() handle it)
     def check_in_book(self, book_id: str) -> str:
         try:
             with self.db.begin():
@@ -24,11 +24,11 @@ class CheckService:
                     returned=True
                 )
 
-            self.check_book_repo.add_record(record)
+            self.checkout_history_repo.add_record(record)
         except Exception:
             self.db.rollback()
             raise
-
+    # (no need to call commit, db.begin() + db.rollback() handle it)
     def check_out_book(self, book_id: str) -> str:
         try:
             with self.db.begin():
@@ -40,13 +40,19 @@ class CheckService:
                     returned = False
                 )
 
-            self.check_book_repo.add_record(record)
+            self.checkout_history_repo.add_record(record)
         except Exception:
             self.db.rollback()
             raise
+
+    def add_seed_records(self, records: CheckoutHistory) -> None:
+        self.checkout_history_repo.add_seed_records(records)
 
     def get_checkout_history(self, book_id: str) -> list[CheckoutHistory]:
         if not isinstance(book_id, str):
             raise TypeError('Expected str, got something else.')
 
-        return self.check_book_repo.get_history_for_book(book_id)
+        return self.checkout_history_repo.get_history_for_book(book_id)
+
+    def get_checkout_history_all(self) -> list[CheckoutHistory]:
+        return self.checkout_history_repo.get_checkout_history_all()

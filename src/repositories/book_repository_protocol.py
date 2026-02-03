@@ -16,3 +16,6 @@ class BookRepositoryProtocol(Protocol):
 
     def check_out_book(self, book_id:str) -> Book:
         ...
+
+    def add_seed_records(self, books: list[Book]) -> None:
+        ...

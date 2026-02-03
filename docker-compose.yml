@@ -4,14 +4,17 @@ services:
     container_name: myapp
     env_file:
       - .env
-    volumes:  # Makes it so you don't have to rebuild the container if you update python code
-     - .:/app # useful for development, remove in prod, or during migrations
+    # Bind mount local source into the container so code changes
+    # and generated files (e.g. migrations) are reflected instantly
+    # without rebuilding the image. Dev-only; remove in prod.
+    volumes:
+     - .:/app 
     depends_on:
       db:
         condition: service_healthy
     ports:
       - "8000:8000"
-    command: ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8000"]
+    command: ["uvicorn", "src.main:app", "--reload", "--host", "0.0.0.0", "--port", "8000"]
 
   db:
     image: postgres:15

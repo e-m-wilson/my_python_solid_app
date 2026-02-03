@@ -19,4 +19,6 @@ class CheckoutHistory(Base):
     returned = Column(Boolean, default=False)
 
     # Relationship for easy access from Book
+    # Allows us to do stuff like this:
+    # active_checkouts = [c for c in book.checkout_records if not c.returned]
     book = relationship("Book", backref="checkout_records")

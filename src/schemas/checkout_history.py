@@ -1,10 +1,9 @@
 from typing import Optional
-from uuid import UUID
 from datetime import datetime
 from pydantic import BaseModel
+from uuid import UUID
 
 class CheckoutHistoryCreate(BaseModel):
-    book_id: UUID
     checkout_date: Optional[datetime] = None
     due_date: Optional[datetime] = None
     return_date: Optional[datetime] = None
@@ -14,10 +13,10 @@ class CheckoutHistoryCreate(BaseModel):
 class CheckoutHistoryRead(CheckoutHistoryCreate):
     checkout_id: UUID
     book_id: UUID
-    checkout_date: datetime
-    due_date: Optional[datetime]
-    return_date: Optional[datetime]
-    returned: bool
+    checkout_date: Optional[datetime] = None
+    due_date: Optional[datetime] = None
+    return_date: Optional[datetime] = None
+    returned: Optional[bool] = None
 
     class Config:
         from_attributes = True

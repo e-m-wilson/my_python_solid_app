@@ -25,3 +25,6 @@ class BookService:
         if not isinstance(book_id, str):
             raise TypeError('Expected str, got something else.')
         return self.book_repo.check_in_book(book_id)
+
+    def add_seed_records(self, books: list[Book]) -> None:
+        self.book_repo.add_seed_records(books)

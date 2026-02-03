@@ -35,3 +35,9 @@ class SQLBookRepository(BookRepositoryProtocol):
         self.session.commit()
         self.session.refresh(book)
         return book
+    
+    def add_seed_records(self, books: list[Book]) -> None:
+        for b in books:
+            self.session.add(b)
+
+        self.session.commit()
