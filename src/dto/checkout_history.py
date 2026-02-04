@@ -4,6 +4,7 @@ from pydantic import BaseModel
 from uuid import UUID
 
 class CheckoutHistoryCreate(BaseModel):
+    book_id: UUID
     checkout_date: Optional[datetime] = None
     due_date: Optional[datetime] = None
     return_date: Optional[datetime] = None

@@ -2,10 +2,10 @@ from uuid import UUID
 from fastapi import Depends, FastAPI, Query
 from sqlalchemy.orm import Session
 
-from db.deps import get_db
+from src.db.deps import get_db
 from src.domain.book import Book
-from src.pydantic_schemas.book import BookCreate, BookRead
-from src.pydantic_schemas.checkout_history import CheckoutHistoryCreate, CheckoutHistoryRead
+from src.dto.book import BookCreate, BookRead
+from src.dto.checkout_history import CheckoutHistoryCreate, CheckoutHistoryRead
 from src.repositories.book_repository_sql import SQLBookRepository
 from src.repositories.checkout_history_repo import SQLCheckoutHistoryRepository
 from src.services.book_analytics_service import BookAnalyticsService

@@ -21,4 +21,4 @@ COPY --from=builder /app /app
 COPY --from=builder /usr/local/bin /usr/local/bin
 ENV PYTHONUNBUFFERED=1
 ENV PATH="/usr/local/bin:/root/.local/bin:$PATH"
-CMD ["uvicorn", "src.main:app", "--reload", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "src.main:app", "--reload", "--reload-dir", "/app/src", "--host", "0.0.0.0", "--port", "8000"]

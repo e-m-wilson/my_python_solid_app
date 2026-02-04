@@ -1,6 +1,6 @@
 from typing import Optional
 from uuid import UUID
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 class BookCreate(BaseModel):
     title: str
@@ -16,7 +16,6 @@ class BookCreate(BaseModel):
     format: Optional[str] = None
     in_print: Optional[bool] = True
     sales_millions: Optional[float] = None
-    last_checkout: Optional[str] = None
     publisher_email: Optional[str] = None
 
 
@@ -25,10 +24,6 @@ class BookRead(BaseModel):
     title: str
     author: str
 
-    class Config:
+    model_config = ConfigDict(
         from_attributes = True
-        fields = {
-            "book_id": ...,
-            "title": ...,
-            "author": ...,
-        }
+    )

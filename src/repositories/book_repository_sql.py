@@ -23,7 +23,6 @@ class SQLBookRepository(BookRepositoryProtocol):
             raise Exception("Book now found.")
         book.check_out()
         self.session.commit()
-        self.session.refresh(book)
         return book
 
     def check_in_book(self, book_id: str) -> Book:
@@ -32,7 +31,6 @@ class SQLBookRepository(BookRepositoryProtocol):
             raise Exception("Book now found.")
         book.check_in()
         self.session.commit()
-        self.session.refresh(book)
         return book
 
     def add_seed_records(self, books: list[Book]) -> None:

@@ -1,3 +1,6 @@
+from sqlalchemy.exc import SQLAlchemyError
+
+
 from src.repositories.checkout_history_protocol import CheckoutHistoryRepositoryProtocol
 from src.repositories.book_repository_protocol import BookRepositoryProtocol
 from src.domain.checkout_history import CheckoutHistory
@@ -26,32 +29,32 @@ class CheckoutHistoryService:
     
     def check_in_book(self, book_id: str) -> str:
         try:
-            with self.db.begin():
-                self.book_repo.check_in_book(book_id)
+            self.book_repo.check_in_book(book_id)
 
-                record = CheckoutHistory(
-                    book_id=book_id,
-                    returned_date=datetime.now(timezone.utc),
-                    returned=True
-                )
+            record = CheckoutHistory(
+                book_id=book_id,
+                returned_date=datetime.now(timezone.utc),
+                returned=True
+            )
 
-                self.checkout_history_repo.add_record(record)
-        except Exception:
+            self.checkout_history_repo.add_record(record)
+            self.db.commit()
+        except SQLAlchemyError:
             self.db.rollback()
             raise
 
     def check_out_book(self, book_id: str) -> str:
         try:
-            with self.db.begin():
-                self.book_repo.check_out_book(book_id)
+            self.book_repo.check_out_book(book_id)
 
-                record = CheckoutHistory(
-                    book_id=book_id,
-                    checkout_date=datetime.now(timezone.utc),
-                    returned=False
-                )
+            record = CheckoutHistory(
+                book_id=book_id,
+                checkout_date=datetime.now(timezone.utc),
+                returned=False
+            )
 
-                self.checkout_history_repo.add_record(record)
-        except Exception:
+            self.checkout_history_repo.add_record(record)
+            self.db.commit()
+        except SQLAlchemyError:
             self.db.rollback()
             raise

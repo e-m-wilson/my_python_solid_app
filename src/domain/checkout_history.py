@@ -13,7 +13,7 @@ class CheckoutHistory(Base):
     book_id = Column(UUID(as_uuid=True), ForeignKey("books.book_id"), nullable=False)
 
     checkout_date = Column(DateTime, default=datetime.now(timezone.utc))
-    return_date = Column(DateTime, nullable=True)
+    returned_date = Column(DateTime, nullable=True)
     due_date = Column(DateTime, nullable=True)
     returned = Column(Boolean, default=False)
 

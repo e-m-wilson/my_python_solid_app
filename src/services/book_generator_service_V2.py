@@ -140,19 +140,19 @@ def generate(filename="books.json", count=500, seed=None) -> tuple[list[Book], l
                 days=int(rng.integers(0, 365)), seconds=int(rng.integers(0, 86400))
             )
             due_date = checkout_date + timedelta(days=14)
-            return_date = (
+            returned_date = (
                 due_date + timedelta(days=int(rng.integers(0, 7)))
                 if rng.choice([True, False])
                 else None
             )
-            returned = return_date is not None
+            returned = returned_date is not None
 
             checkout_history = CheckoutHistory(
                 checkout_id=uuid.uuid4(),
                 book_id=book_id,
                 checkout_date=checkout_date,
                 due_date=due_date,
-                return_date=return_date,
+                returned_date=returned_date,
                 returned=returned,
             )
             checkout_histories.append(checkout_history)
