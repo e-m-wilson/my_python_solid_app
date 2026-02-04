@@ -5,13 +5,9 @@ from sqlalchemy import pool
 
 from alembic import context
 
-from dotenv import load_dotenv
-load_dotenv()
-
-import os
-
 # THIS IS 100% REQUIRED IN ORDER FOR YOUR CONTEXT TO POPULATE WITH METADATA
 # YOUR CONTEXT WILL NOT GET YOUR BASE METADATA UNLESS YOU IMPORT ALL OF THE EFFECTED DOMAIN MODELS
+from src.settings import settings
 import src.domain
 from src.base import Base
 
@@ -19,9 +15,7 @@ from src.base import Base
 # access to the values within the .ini file in use.
 config = context.config
 
-database_url = os.getenv('DATABASE_URL')
-if database_url:
-    config.set_main_option("sqlalchemy.url", database_url)
+config.set_main_option("sqlalchemy.url", settings.DATABASE_URL)
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
