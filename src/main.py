@@ -1,5 +1,5 @@
 from uuid import UUID
-from fastapi import Depends, FastAPI, Query
+from fastapi import Depends, FastAPI, Query, HTTPException
 from sqlalchemy.orm import Session
 
 from src.db.deps import get_db
