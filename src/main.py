@@ -1,6 +1,11 @@
 from uuid import UUID
-from fastapi import Depends, FastAPI, Query
+from fastapi import Depends, FastAPI, Query, HTTPException
+from fastapi.responses import JSONResponse
+from fastapi.requests import Request
 from sqlalchemy.orm import Session
+
+from src.logging_config import setup_logging
+import logging
 
 from src.db.deps import get_db
 from src.domain.book import Book
@@ -13,9 +18,23 @@ from src.services.book_generator_service_V2 import generate
 from src.services.book_service import BookService
 from src.services.checkout_history_service import CheckoutHistoryService
 
+# each module gets its own logger, 
+# but this is only called once to setup our config
+setup_logging()
+
+# __name__ resolved to __main__ if run directly
+# my_package.my_module if run from another file via imports
+# common for each module to have it's own logger/separation of concerns 
+logger = logging.getLogger(__name__)
 
 app = FastAPI(title="Book API")
 
+
+#
+#      Setting up dependency injection for each of the endpoints
+#      Depends() function from FastAPI is key, notice how each endpoint depends on the following 
+#      Central location to swap out concretions    
+#
 def get_book_repository(db: Session = Depends(get_db)) -> SQLBookRepository:
     return SQLBookRepository(db)
 
@@ -34,6 +53,37 @@ def get_checkout_history_service(
 
 def get_book_analytics_service() -> BookAnalyticsService:
     return BookAnalyticsService()
+
+#
+#
+#    These are FastAPI global exception handlers
+#      We have one for HTTP exceptions (defensive, we SHOULD return HTTPExceptions from the endpoint as well)
+#      The HTTPExcepction handler will take/handle our HTTPExceptions we throw in our endpoints - no try-except
+#      These are controlled and expected errors.
+#
+#      The generic exception handler acts as a safety net for any other unhandled exceptions
+#    Both of these will be called automatically by FastAPI
+#    (assuming the exception isn't explicitly handled with try-except)
+#    Order matters: notice that we declare the HTTP one FIRST; More specific > more general
+#
+# Controlled exceptions handled by the application:
+@app.exception_handler(HTTPException)
+async def http_exception_handler(request: Request, exc: HTTPException):
+    return JSONResponse(
+        status_code=exc.status_code,
+        # safe to return detail here - this is intentional
+        content={"detail": exc.detail},
+    )
+
+# unexpected errors
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    logger.exception("Unhandled exception")
+    return JSONResponse(
+        status_code=500,
+        # here we give a vague message; we are NOT exposing execution details to the client
+        content={"detail": "Internal server error"},
+    )
 
 
 #
