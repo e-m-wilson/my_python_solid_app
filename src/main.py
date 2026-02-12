@@ -70,6 +70,7 @@ def get_book_analytics_service() -> BookAnalyticsService:
 # Controlled exceptions handled by the application:
 @app.exception_handler(HTTPException)
 async def http_exception_handler(request: Request, exc: HTTPException):
+    logger.exception("HTTP Exception occurred.")
     return JSONResponse(
         status_code=exc.status_code,
         # safe to return detail here - this is intentional

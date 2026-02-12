@@ -9,7 +9,8 @@ from src.repositories.book_repository_protocol import BookRepositoryProtocol
 from src.domain.checkout_history import CheckoutHistory
 from datetime import datetime, timezone
 
-logger = logging.getLogger(__name__)
+# example showing setting custom level for different module:
+logger = logging.getLogger(__name__).setLevel(logging.DEBUG)
 
 # passing this db like this is a design smell 
 # if we were aiming for perfect SOLID/CLEAN architecture

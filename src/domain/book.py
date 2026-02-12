@@ -26,7 +26,6 @@ class Book(Base):
     publisher_email = Column(String, nullable=True)
 
 '''
-
     The domain shouldn't handle this.
     The service layer should handle this.
 
