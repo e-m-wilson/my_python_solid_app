@@ -8,6 +8,9 @@ class SQLBookRepository(BookRepositoryProtocol):
 
     def get_all_books(self) -> list[Book]:
         return self.session.query(Book).all()
+    
+    def find_book_by_id(self, book_id:str) ->  Book:
+        return self.session.get(Book, book_id)
 
     def add_book(self, book:Book) -> str:
         self.session.add(book)
@@ -19,17 +22,13 @@ class SQLBookRepository(BookRepositoryProtocol):
 
     def check_out_book(self, book_id: str) -> Book:
         book = self.session.get(Book, book_id)
-        if not book:
-            raise Exception("Book now found.")
-        book.check_out()
+        book.available = False
         self.session.commit()
         return book
 
     def check_in_book(self, book_id: str) -> Book:
         book = self.session.get(Book, book_id)
-        if not book:
-            raise Exception("Book now found.")
-        book.check_in()
+        book.available = True
         self.session.commit()
         return book
 

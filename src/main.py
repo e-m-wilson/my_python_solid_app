@@ -4,6 +4,7 @@ from fastapi.responses import JSONResponse
 from fastapi.requests import Request
 from sqlalchemy.orm import Session
 
+from src.domain.exceptions import AppErrorException, NotFoundException, PermissionDeniedException
 from src.logging_config import setup_logging
 import logging
 
@@ -106,9 +107,19 @@ def check_out_book(
     payload: CheckoutHistoryCreate,
     svc: CheckoutHistoryService = Depends(get_checkout_history_service),
 ):
-    svc.check_out_book(payload.book_id)
-    return {"status": "checked out"}
-
+    try:
+        logger.info("Checking out book id=%s", payload.book_id)
+        svc.check_out_book(payload.book_id)
+        return {"status": "checked out"}
+    except NotFoundException:
+        logger.warning("Book not found id=%s", payload.book_id)
+        raise HTTPException(status_code=500, detail="Book not found.")
+    except AppErrorException:
+        logger.warning("Book already check out. id=%s", payload.book_id)
+        raise HTTPException(status_code=400, detail="Book already checked out.")
+    except Exception:
+        logger.exception("Unexpected checkout failure")
+        raise HTTPException(status_code=500, detail="Internal server error")
 
 @app.get("/checkouthistory", response_model=list[CheckoutHistoryRead])
 def checkout_history(

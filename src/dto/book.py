@@ -16,6 +16,7 @@ class BookCreate(BaseModel):
     format: Optional[str] = None
     in_print: Optional[bool] = True
     sales_millions: Optional[float] = None
+    available: Optional[bool] = None
     publisher_email: Optional[str] = None
 
 
@@ -23,6 +24,7 @@ class BookRead(BaseModel):
     book_id: UUID
     title: str
     author: str
+    available: bool
 
     model_config = ConfigDict(
         from_attributes = True

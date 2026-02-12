@@ -19,3 +19,7 @@ class BookRepositoryProtocol(Protocol):
 
     def add_seed_records(self, books: list[Book]) -> None:
         ...
+
+    def find_book_by_id(self, book_id:str) -> Book:
+        ...
+    

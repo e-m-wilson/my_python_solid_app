@@ -25,6 +25,11 @@ class Book(Base):
     available = Column(Boolean, default=True)
     publisher_email = Column(String, nullable=True)
 
+'''
+
+    The domain shouldn't handle this.
+    The service layer should handle this.
+
     def check_out(self):
         if not self.available:
             raise Exception("Book is already checked out.")
@@ -34,3 +39,4 @@ class Book(Base):
         if self.available:
             raise Exception("Book is already available.")
         self.available = True
+'''
